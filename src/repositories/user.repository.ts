@@ -1,8 +1,6 @@
 import db from '../db';
 import User from '../models/user.model';
 
-db;
-
 class UserRepository {
   async findAllUsers(): Promise<User[]> {
     const query = `
@@ -10,8 +8,7 @@ class UserRepository {
       FROM application_user
     `;
 
-    const result = await db.query<User>(query);
-    const rows = result.rows;
+    const { rows } = await db.query<User>(query);
 
     return rows || [];
   }
