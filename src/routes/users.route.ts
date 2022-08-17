@@ -23,12 +23,15 @@ usersRoute.get(
   }
 );
 
-usersRoute.post('/users', (req: Request, res: Response, next: NextFunction) => {
-  const newUser = req.body;
-  console.log(newUser);
+usersRoute.post(
+  '/users',
+  async (req: Request, res: Response, next: NextFunction) => {
+    const newUser = req.body;
+    const uuid = await userRepository.createUser(newUser);
 
-  res.sendStatus(StatusCodes.CREATED); /* .send(newUser) */
-});
+    res.status(StatusCodes.CREATED).send(uuid); /* .send(newUser) */
+  }
+);
 
 usersRoute.put(
   '/users/:uuid',
