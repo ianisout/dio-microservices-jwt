@@ -49,8 +49,10 @@ usersRoute.put(
 
 usersRoute.delete(
   '/users/:uuid',
-  (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+  async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     const { uuid } = req.params;
+
+    await userRepository.deleteUser(uuid);
 
     res.sendStatus(StatusCodes.OK);
   }
