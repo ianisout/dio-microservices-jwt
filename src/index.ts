@@ -1,6 +1,7 @@
 import express from 'express';
 import statusRoute from './routes/status.route';
 import usersRoute from './routes/users.route';
+require('dotenv').config();
 
 const app = express();
 
