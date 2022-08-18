@@ -19,28 +19,30 @@ export default async function bearerAuthenticationMiddleware(
     const [authType, token] = authorizationHeader.split(' ');
     if (authType !== 'Bearer' || !token) throwError('Invalid authentication');
 
-    const tokenPayload = JWT.verify(token, 'my_secret_key');
+    try {
+      const tokenPayload = JWT.verify(token, 'my_secret_key');
 
-    if (typeof tokenPayload !== 'object' || !tokenPayload.sub) {
+      if (typeof tokenPayload !== 'object' || !tokenPayload.sub)
+        throwError('Invalid token');
+      const { sub } = tokenPayload;
+      const uuid = JSON.stringify(sub).slice(1, 37);
+      /*
+        *quick fix*
+        slicing a stringified JSON because TS was assigning
+        a <sub> tag value to the sub in the JWT object
+      */
+
+      const user = await userRepository.findById(uuid);
+
+      // const user = { uuid: tokenPayload.sub, username: tokenPayload.username };
+      // above more performatic without searching db
+
+      req.user = user;
+
+      next();
+    } catch (error) {
       throwError('Invalid token');
     }
-
-    const { sub } = tokenPayload;
-    const uuid = JSON.stringify(sub).slice(1, 37);
-    /*
-      *quick fix*
-      slicing a stringified JSON because TS was assigning
-      a <sub> tag value to the sub in the JWT object
-    */
-
-    const user = await userRepository.findById(uuid);
-
-    // const user = { uuid: tokenPayload.sub, username: tokenPayload.username };
-    // above more performatic without searching db
-
-    req.user = user;
-
-    next();
   } catch (error) {
     next(error);
   }
